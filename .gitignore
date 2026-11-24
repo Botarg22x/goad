@@ -1,0 +1,68 @@
+# Python and local environments
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+build/
+dist/
+
+# Results may contain credentials, tokens, personal data or copied pages.
+artifacts/
+output/
+outputs/
+runs/
+reports/
+browser_profile/
+*-auth-*.jsonl
+audit*.jsonl
+attempts*.jsonl
+login_gen_module_2/sibsutis/
+gitlab/auth-pages-auth-*.jsonl
+gitlab/test-passwords.txt
+pass_start.txt
+passwords.txt
+candidates.txt
+logins.txt
+emails.txt
+fio.txt
+auth-links.txt
+report.json
+report.txt
+*.partial.txt
+*.part
+*.passgen.lock
+
+# External tools and corpora must be installed/downloaded separately.
+discovery_module_3/katana/
+discovery_module_3/nmap/
+pass_gen_module_1/dictionaries/rockyou.txt
+pass_gen_module_1/new.txt
+pass_gen_module_1/new1.txt
+pass_gen_module_1/test.txt
+bitrix/env-docker/
+
+# Local secrets and editor/system files.
+.agents/
+.aws/
+.codex/
+.env
+.env.*
+!.env.example
+*.pem
+*.crt
+*.cer
+*.der
+*.key
+*.p12
+*.pfx
+.idea/
+.vscode/
+.DS_Store
+
+# Retired prototype, not used by the workspace installer.
+3 модуль/

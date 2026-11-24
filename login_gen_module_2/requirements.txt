@@ -1,0 +1,2 @@
+# Runtime dependencies for browser-backed auto/search/PDF collection.
+-e .[browser,pdf]

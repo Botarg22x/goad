@@ -1,0 +1,38 @@
+# Шаблон для НОВОГО продукта с обычной HTML-формой. Скопируйте в myproduct.yaml.
+# Замените имена полей и строки ответа на данные своего стенда.
+# Файл .example не загружается, пока вы не переименуете его в .yaml.
+
+id: myproduct
+label: MyProduct
+category: webapp
+paths: [/login/]
+
+detection:
+  username_fields: [username]
+  password_fields: [password]
+  signals_any:
+    - in_body: 'data-product="myproduct"'
+
+verification:
+  schema: form-check/1
+  transport: auto
+  request:
+    session: fresh
+    csrf_fields: []
+    raw: |-
+      POST {{action}} HTTP/1.1
+      Host: {{host}}
+      Content-Type: application/x-www-form-urlencoded
+
+      username={{login}}&password={{password}}&{{form_fields}}
+  result:
+    success_any:
+      - in_body: 'data-authenticated="true"'
+    failure_any:
+      - in_body: 'Неверный логин или пароль'
+    captcha_any: []
+    mfa_any: []
+    csrf_error_any: []
+
+# Если известна только страница, но не запрос и признаки результата,
+# удалите весь блок verification: модуль 3 всё равно присвоит продуктовый тег.

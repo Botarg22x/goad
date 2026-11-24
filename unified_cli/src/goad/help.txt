@@ -1,0 +1,35 @@
+GOAD — ЧЕТЫРЕ НЕЗАВИСИМЫХ МОДУЛЯ
+
+Использование: goad КОМАНДА [ПАРАМЕТРЫ]
+
+# ==================== ОСНОВНОЕ ====================
+
+passwords    Создать файл паролей (passgen)
+logins       Собрать ФИО и e-mail; с -g создать кандидатов (logingen)
+discover     Найти страницы входа (pointfinder)
+check        Проверить вход по найденным ссылкам (authchecker)
+run          Дополнительный запуск нескольких этапов одной командой
+doctor       Проверить установку модулей
+
+Отдельные команды passgen, logingen, pointfinder и authchecker остаются доступны.
+Обычно модули запускают по очереди; run нужен, когда удобнее объединить этапы.
+
+# ==================== ПРИМЕРЫ ====================
+
+goad passwords -p 'Admin?d?d' -o passwords.txt --plan
+goad logins --domain example.ru --company 'Пример'
+goad discover -u https://example.ru --links-output auth-links.txt
+goad check -u auth-links.txt -l admin -p passwords.txt --slow
+
+Одна готовая страница входа: goad check -u https://example.ru/login -l admin -p 'пароль'
+Поиск без проверки паролей: goad run -u https://example.ru --collect-points
+
+# ==================== СПРАВКА ====================
+
+goad passwords -h    Маски, словари и вывод паролей
+goad logins -h       Пассивный и активный сбор, генерация
+goad discover -h    Обход, шаблоны и отчёты
+goad check -h       Входные данные, лимиты и результат
+goad run -h         Объединённый запуск
+
+Работайте только с системами, на проверку которых у вас есть разрешение.

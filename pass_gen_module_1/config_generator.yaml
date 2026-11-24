@@ -1,0 +1,140 @@
+# Готовый исполняемый пример YAML-конфигурации passgen.
+#
+# Быстрый старт:
+#   1. Скопируйте этот файл, например как my_passgen.yaml.
+#   2. Измените patterns и output.path; при необходимости добавьте wordlists.
+#   3. Проверьте: passgen from-config my_passgen.yaml --check
+#   4. Посмотрите план: passgen from-config my_passgen.yaml --plan
+#   5. Запустите: passgen from-config my_passgen.yaml --yes --stats
+#
+# Пути ниже относительны к папке, где находится сам YAML-файл.
+# Всё, что начинается с #, является комментарием и не влияет на запуск.
+# YAML строгий: неизвестные поля запрещены, а логические значения пишутся
+# только как true или false.
+#
+# Минимальный рабочий конфиг состоит всего из:
+#   version: 2
+#   patterns:
+#     - "Password?d?d!"
+
+# Обязательная и единственная поддерживаемая версия схемы.
+version: 2
+
+# Необязательные именованные словари. Имя используется в паттерне как {name}.
+# Разрешены латинские буквы, цифры, _ и -; имя должно начинаться с буквы или _.
+wordlists:
+  # {common} раскрывается в строки из dictionaries/demo.txt.
+  common:
+    # Путь к текстовому словарю: относительный или абсолютный.
+    path: dictionaries/demo.txt
+    # Кодировка файла словаря. По умолчанию utf-8.
+    encoding: utf-8
+    # Сколько физических строк прочитать: положительное число или all.
+    max_lines: 10
+    # Необязательные фильтры строк словаря по длине.
+    min_length: 4
+    max_length: 20
+    # require: в слове должны быть ВСЕ указанные категории;
+    # forbid: в слове не должно быть ни одной указанной категории.
+    # Категории: digits, lowercase, uppercase, special.
+    # require: [lowercase]
+    # forbid: [digits]
+
+  names:
+    path: dictionaries/names.txt
+    encoding: utf-8
+    max_lines: all
+    min_length: 3
+    max_length: 20
+
+  years:
+    path: dictionaries/years.txt
+    encoding: utf-8
+    max_lines: all
+
+# Необязательные наборы символов. Ключи "1" ... "4" используются как ?1 ... ?4.
+# Именованный набор, например vowels: "aeiou", применяется как ?{vowels}.
+# Повторяющиеся символы внутри набора автоматически удаляются.
+# Встроенные наборы: ?l, ?u, ?d, ?s, ?a, ?h, ?H,
+# ?{cyrillic_lower} и ?{cyrillic_upper}.
+charsets:
+  "1": "йцук"
+  "2": "ABC123"
+  # vowels: "aeiou"
+
+# Необязательный блок мутаций. Удалите его полностью, если мутации не нужны.
+mutations:
+  # independent: каждое правило применяется к исходному кандидату отдельно.
+  # chained: правила применяются последовательно, выдаётся итог цепочки.
+  mode: independent
+  # Добавлять исходный кандидат вместе с вариантами мутаций.
+  include_original: true
+  # Применять мутации ко всем строковым patterns по умолчанию.
+  # Для отдельного паттерна это переопределяется apply_mutations ниже.
+  default_apply: false
+
+  # Встроенные правила. Доступны: append, prepend, replace,
+  # uppercase/uppercase_all, lowercase/lowercase_all, capitalize_first,
+  # reverse, ru_to_eng, url_encode_specials и base64_encode.
+  rules:
+    - type: capitalize_first
+    - type: uppercase
+    - type: replace
+      from: "a" # Что заменить; пустая строка запрещена.
+      to: "@"   # На что заменить; пустая строка допустима.
+    # - type: append
+    #   value: "2026"
+    # - type: prepend
+    #   value: "corp_"
+
+  # Необязательные файлы с поддерживаемым подмножеством правил hashcat.
+  rule_files:
+    - path: rules/demo.rule
+      encoding: utf-8
+      # Положительное число или all. Здесь читаются только первые два правила.
+      max_rules: 2
+
+# Хотя бы один паттерн обязателен. Полная таблица токенов есть в README.
+# Паттерны лучше писать в кавычках: некоторые токены, например ?d, YAML
+# без кавычек может принять за служебный синтаксис.
+# ?l/?u/?d — латинские буквы/цифры; ?1 — charset выше;
+# ?{cyrillic_upper} — встроенный именованный charset; {names} — словарь.
+patterns:
+  # Формат mapping нужен, когда мутации включаются только для этого паттерна.
+  - value: "{common}"
+    apply_mutations: true
+
+  # Простая строка использует mutations.default_apply (здесь false).
+  - "Password?d?d!"
+  - "{names}?d"
+  - "{names}_{years}"
+  - "?1?1{names}"
+  - "?{cyrillic_upper}?d"
+
+# Необязательные глобальные фильтры уже готовых кандидатов.
+result_filters:
+  # Оставить кандидаты длиной от 1 до 128 символов включительно.
+  min_length: 1
+  max_length: 128
+  # Не выпускать ASCII U+0000–U+001F и U+007F (DEL).
+  # NUL, CR и LF запрещены всегда; Unicode C1 U+0080–U+009F не фильтруются.
+  forbid_control_characters: true
+  # Также доступны require/forbid с категориями digits, lowercase, uppercase, special.
+  # require: [digits, lowercase]
+  # forbid: [special]
+
+# Необязательные настройки подтверждения запуска.
+generation:
+  # В неинтерактивном терминале при большей оценке нужен --yes.
+  # 0 означает, что --yes потребуется при любом непустом плане.
+  confirm_above: 1_000_000
+
+# Необязательные настройки результата.
+output:
+  # Путь к результату. "-" направляет кандидаты в stdout.
+  path: outputs/candidates_v2.txt
+  # Кодировка output; по умолчанию utf-8.
+  encoding: utf-8
+  # false: атомарно объединить со старым output и удалить дубликаты.
+  # true: атомарно заменить старый output только новыми кандидатами.
+  overwrite: false

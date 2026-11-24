@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logingen"
+version = "0.1.0"
+description = "Standalone passive and active collection of names, emails and login candidates."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+browser = ["playwright>=1.40"]
+pdf = ["pdfminer.six>=20231228"]
+documents = ["pdfminer.six>=20231228"]
+
+[project.scripts]
+logingen = "logingen.cli:main"
+
+[tool.setuptools]
+packages = ["logingen"]
+
+[tool.setuptools.package-data]
+logingen = ["data/*.txt"]
+
+[tool.unittest]
+testpaths = ["tests"]

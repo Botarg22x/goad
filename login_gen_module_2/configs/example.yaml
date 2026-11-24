@@ -1,0 +1,135 @@
+# Generation mode for the current module. Future OSINT collection should live
+# in a separate authorized-audit module and feed people/patterns into this file.
+mode: manual
+
+company: example
+domains:
+  - example.ru
+
+auto:
+  enabled: false
+  url: ""
+  extra_urls: []
+  # Empty means: allow only the host from auto.url.
+  allowed_domains: []
+  max_pages: 20
+  max_depth: 2
+  timeout_seconds: 10
+  request_delay_seconds: 0
+  search_delay_seconds: 10
+  user_agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+  proxy_url: ""
+  ca_cert: ""
+  respect_robots_txt: true
+  collect_emails: true
+  collect_people: true
+  browser_crawl: true
+  browser_headless: true
+  browser_manual_access: true
+  browser_channel: ""
+  browser_user_data_dir: output/browser_profile
+  browser_timeout_seconds: 20
+  browser_wait_ms: 1500
+  captcha_wait_seconds: 300
+  captcha_poll_seconds: 2
+  browser_pages_dir: output/site_pages
+  mail_from_url_path: output/mail_from_url.txt
+  fio_path: output/fio.txt
+  vedomosti_enabled: true
+  setka_enabled: false
+  search_enabled: true
+  search_engines:
+    - yandex
+  search_dorks_path: dictionary/dorks
+  search_results_dir: output/search_results
+  pdf_enabled: true
+  pdf_files_dir: output/pdf
+  pdf_max_files: 20
+  found_emails_path: output/found_emails.txt
+  email_sources_path: output/email_sources.csv
+  log_path: output/auto.log
+
+output:
+  path: output/logins.txt
+  # login, email, or both
+  kind: both
+
+limits:
+  # Maximum number of final lines written to the output file.
+  total: 1000
+  # Maximum number of local login candidates generated per person before
+  # domain expansion.
+  per_person: 25
+
+generation:
+  use_default_people_when_empty: true
+  include_technical_words: true
+  case: lower
+  separator: "."
+  max_translit_variants_per_field: 16
+  candidate_formats_path: dictionary/candidate_formats
+  candidate_formats: []
+  ad_domain: ""
+  netbios: ""
+  masks_path: dictionary/masks
+  custom_charsets: {}
+  max_mask_expansions_per_pattern: 1000
+
+patterns:
+  person:
+    - "{f}.{lastname}"
+    - "{firstname}.{lastname}"
+    - "{lastname}.{firstname}"
+    - "{lastname}.{f}"
+    - "{f}{lastname}"
+    - "{lastname}{f}"
+    - "{firstname}_{lastname}"
+    - "{lastname}_{firstname}"
+    - "{firstname}-{lastname}"
+    - "{lastname}-{firstname}"
+    - "{lastname}.{f2}"
+    - "{f2}.{lastname}"
+    - "{f3}.{lastname}"
+  technical:
+    - "{word}"
+    - "{word}.{company}"
+    - "{company}.{word}"
+
+people: []
+
+technical_words_path: dictionary/technical_words
+
+transliteration:
+  а: a
+  б: b
+  в: v
+  г: g
+  д: d
+  е: e
+  ё: [e, yo]
+  ж: [zh, j]
+  з: z
+  и: i
+  й: [y, i]
+  к: k
+  л: l
+  м: m
+  н: n
+  о: o
+  п: p
+  р: r
+  с: s
+  т: t
+  у: u
+  ф: f
+  х: [kh, h]
+  ц: [ts, c]
+  ч: [ch, tch]
+  ш: sh
+  щ: [sch, shch]
+  ъ: ""
+  ы: [y, i]
+  ь: ""
+  э: e
+  ю: [yu, iu]
+  я: [ya, ia]

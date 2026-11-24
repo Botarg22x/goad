@@ -1,0 +1,7 @@
+# One final candidate format per line.
+# Available variables: {login}, {mail}, {email}, {mail_domain}, {domain}, {ad_domain}, {netbios}, {company}
+{login}
+{mail}
+{netbios}\{login}
+{login}@{ad_domain}
+{login}@{mail_domain}

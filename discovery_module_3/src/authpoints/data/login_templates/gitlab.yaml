@@ -1,0 +1,42 @@
+# Страница GitLab с JS-полями: распознаётся по HTML, даже если поля скрыты.
+id: gitlab
+label: GitLab
+category: devops
+paths:
+  - /users/sign_in
+
+detection:
+  status_codes: [200]
+  match:
+    all:
+      - in_body: 'GitLab'
+      - in_body: 'name="user[login]"'
+      - in_body: 'name="user[password]"'
+      - path_contains: /users/sign_in
+
+verification:
+  schema: form-check/1
+  transport: auto
+  request:
+    action: fixed
+    session: fresh
+    csrf_fields: [authenticity_token]
+    raw: |-
+      POST /users/sign_in HTTP/1.1
+      Host: {{host}}
+      Content-Type: application/x-www-form-urlencoded
+
+      user%5Blogin%5D={{login}}&user%5Bpassword%5D={{password}}&user%5Bremember_me%5D=0&{{form_fields}}
+  result:
+    # Код относится к POST; остальные ответы не считаются успешным входом.
+    success_any: []
+    success_status: 302
+    failure_any:
+      - in_body: 'Invalid login or password'
+    failure_status: 200
+    captcha_any:
+      - in_body: 'There was an error with the reCAPTCHA'
+    mfa_any:
+      - input_name: 'user[otp_attempt]'
+    csrf_error_any:
+      - in_body: 'Invalid authenticity token'

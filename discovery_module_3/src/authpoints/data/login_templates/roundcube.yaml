@@ -1,0 +1,14 @@
+id: roundcube
+label: Roundcube Webmail
+category: webmail
+paths:
+  - /roundcube/
+  - /webmail/
+
+detection:
+  username_fields: [_user]
+  password_fields: [_pass]
+  signals_any:
+    - text_contains: roundcube
+    - path_contains: /roundcube
+    - field_names_all: [_task, _token]

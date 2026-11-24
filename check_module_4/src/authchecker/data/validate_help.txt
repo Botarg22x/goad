@@ -1,0 +1,10 @@
+AUTHCHECKER VALIDATE — ПРОВЕРКА ОТЧЁТА
+
+Использование: authchecker validate REPORT.json
+
+# ==================== ОСНОВНОЕ ====================
+
+authchecker validate report.json
+
+Команда проверяет структуру отчёта PointFinder без сетевых запросов.
+-h, --help    Показать эту справку

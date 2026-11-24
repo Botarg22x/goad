@@ -1,0 +1,16 @@
+version: 2
+
+charsets:
+  "1": "ab"
+  "2": "12"
+
+patterns:
+  - "?u?l?dkey"
+  - "?1?2!"
+
+generation:
+  confirm_above: 1_000_000
+
+output:
+  path: ../outputs/test_mask_attack.txt
+  overwrite: true

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "goad"
+version = "0.1.0"
+description = "Unified command-line interface for four independent modules"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+  {name = "GOAD contributors"},
+]
+dependencies = []
+
+[project.scripts]
+goad = "goad.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+goad = ["help.txt", "run_help.txt", "doctor_help.txt"]

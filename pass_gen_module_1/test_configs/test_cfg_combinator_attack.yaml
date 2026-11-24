@@ -1,0 +1,23 @@
+version: 2
+
+wordlists:
+  names:
+    path: ../dictionaries/names.txt
+    max_lines: 3
+    min_length: 3
+    max_length: 20
+
+  years:
+    path: ../dictionaries/years.txt
+    max_lines: 3
+
+patterns:
+  - "{names}_{years}"
+  - "{years}.{names}"
+
+generation:
+  confirm_above: 1_000_000
+
+output:
+  path: ../outputs/test_combinator_attack.txt
+  overwrite: true

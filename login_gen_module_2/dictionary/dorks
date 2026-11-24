@@ -1,0 +1,22 @@
+# One search query template per line.
+# Available variables: {domain}, {email_domain}, {company}, {url}
+"ivanov@{domain}"
+"petrov@{domain}"
+"ivan@{domain}"
+"petr@{domain}"
+"andrei@{domain}"
+"eva@{domain}"
+"elena@{domain}"
+"a@{domain}"
+"b@{domain}"
+"c@{domain}"
+filetype:pdf "@{domain}"
+filetype:pdf "{company}" "@{domain}"
+filetype:pdf "{domain}" контакты
+inurl:"contact" {company}
+intext:email filetype:log {domain}
+"Index of /mail" example.com
+"admin account info" filetype:log {company}
+intext:@ {company}
+intitle:index.of inbox {company}
+php-addressbook "This is the addressbook for *" -warning {company}

@@ -1,0 +1,38 @@
+# Стандартная форма WordPress. После правки запустите discover заново:
+# правила проверки передаются модулю 4 вместе с отчётом.
+id: wordpress
+label: WordPress
+category: cms
+paths:
+  - /wp-login.php
+  - /wp-admin/
+
+detection:
+  # Оба поля должны находиться в одной доступной HTML-форме.
+  username_fields: [log]
+  password_fields: [pwd]
+  signals_any:
+    - in_body_all: ['name="log"', 'name="pwd"']
+
+verification:
+  schema: form-check/1
+  transport: auto
+  request:
+    session: fresh
+    csrf_fields: []
+    # action формы и остальные актуальные поля берутся с новой страницы.
+    raw: |-
+      POST {{action}} HTTP/1.1
+      Host: {{host}}
+      Content-Type: application/x-www-form-urlencoded
+
+      log={{login}}&pwd={{password}}&{{form_fields}}
+  result:
+    success_any:
+      - link_query: {action: logout}
+    failure_any:
+      - in_body: 'id="login_error"'
+    captcha_any: []
+    mfa_any: []
+    csrf_error_any:
+      - in_body: 'Cookies are blocked or not supported by your browser'

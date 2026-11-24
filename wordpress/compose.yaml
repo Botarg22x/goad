@@ -1,0 +1,32 @@
+name: diplom-wordpress-lab
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: local-demo-password
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  wordpress:
+    image: wordpress:latest
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: local-demo-password
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - wp_data:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  wp_data:

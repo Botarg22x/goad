@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pointfinder"
+version = "0.2.0"
+description = "Discovery of authentication entry points without login attempts"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Diploma project" }]
+dependencies = ["PyYAML>=6.0"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.46"]
+
+[project.scripts]
+pointfinder = "authpoints.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+authpoints = ["report.schema.json", "data/*.txt", "data/login_templates/*.yaml", "data/login_templates/*.yml", "data/login_templates/*.yaml.example", "data/login_templates/*.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]

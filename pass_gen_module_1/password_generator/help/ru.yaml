@@ -1,0 +1,67 @@
+common:
+  usage: Использование
+  positional_arguments: Позиционные аргументы
+  options: Параметры
+  help: Показать эту справку и выйти
+  version: Показать версию и выйти
+
+quick:
+  usage: passgen -p PATTERN [ПАРАМЕТРЫ]
+  description: |
+    PASSGEN — ГЕНЕРАТОР ПАРОЛЕЙ
+
+    # ==================== ОСНОВНОЕ ====================
+
+    passgen -p 'Admin?d?d' -o passwords.txt --plan   Оценить объём без записи
+    passgen -p 'Admin?d?d' -o passwords.txt --yes    Создать файл
+
+    Тот же запуск: goad passwords ...
+    Флаг -p можно повторять; результаты попадут в один файл.
+
+    # ==================== ПАТТЕРНЫ ====================
+
+    -p, --pattern PATTERN          Маска пароля
+    ?l / ?u / ?d                 Строчная буква / заглавная буква / цифра
+    ?s / ?a                     Спецсимвол / печатный ASCII-символ
+    ?1...?4                     Набор из --charset1...--charset4
+    ?{name}                     Именованный набор из --charset NAME CHARS
+    {names}                     Строка из словаря names
+
+    Текст вне специальных блоков добавляется буквально: 'Admin?d?d'
+    создаёт Admin00...Admin99.
+
+    # ==================== СЛОВАРИ И МУТАЦИИ ====================
+
+    --wordlist NAME FILE          Подключить словарь к {NAME}; можно повторять
+    --zip-wordlists A,B           Брать строки двух словарей попарно
+    --wl-max-lines NAME N         Прочитать не больше N строк словаря
+    --charset1 CHARS              Символы для ?1
+    --charset NAME CHARS          Символы для ?{NAME}
+    --mutation RULE               Правила через запятую; можно повторять
+    --mutation-mode independent|chained  Отдельно или последовательно
+    --rule-file FILE              Дополнительные правила из файла
+
+    Примеры правил: capitalize_first, uppercase, append=2026, reverse.
+    Без --zip-wordlists два словаря в маске дают все сочетания.
+
+    # ==================== ВЫВОД И ОГРАНИЧЕНИЯ ====================
+
+    -o, --output FILE             Итоговый файл; обычно candidates.txt
+    --max-passwords N             Не больше N уникальных паролей
+    --result-min-length N         Минимальная длина результата
+    --result-max-length N         Максимальная длина результата
+    --plan                        Только расчёт, без записи
+    --yes                         Не спрашивать подтверждение
+    --force                       Заменить файл вместо объединения
+    --stats                       Показать статистику
+    -h, --help                    Показать эту справку
+
+    При Ctrl+C уже созданные строки сохраняются в соседнем .partial.txt.
+    По умолчанию дубликаты не записываются; при существующем файле новые
+    кандидаты добавляются к нему без повторов.
+
+    # ==================== ПРИМЕРЫ ====================
+
+    passgen -p '?l?l?d' --max-passwords 100 -o passwords.txt --yes
+    passgen -p '{names}?d?d' --wordlist names dictionaries/names.txt -o passwords.txt --yes
+    passgen -p '{names}' --wordlist names dictionaries/names.txt --mutation 'capitalize_first,append=2026' -o passwords.txt --yes

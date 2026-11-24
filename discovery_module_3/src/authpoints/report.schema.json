@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pointfinder:report:2.0",
+  "title": "PointFinder report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope", "findings", "services", "issues", "schema_version",
+    "detector_version", "run_id", "started_at", "finished_at", "partial",
+    "config"
+  ],
+  "properties": {
+    "scope": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+    "services": {"type": "array", "items": {"$ref": "#/$defs/service"}},
+    "issues": {"type": "array", "items": {"$ref": "#/$defs/issue"}},
+    "schema_version": {"const": "2.0"},
+    "detector_version": {"type": "string"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": "string", "format": "date-time"},
+    "partial": {"type": "boolean"},
+    "config": {"type": "object"}
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "group", "source", "detail"],
+      "properties": {
+        "rule_id": {"type": "string"},
+        "group": {"type": "string"},
+        "source": {"type": "string"},
+        "detail": {"type": "string"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind", "auth_type", "endpoint", "host", "port", "protocol",
+        "evidence", "sources", "metadata", "id",
+        "discovered_at"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "web_login_page", "http_auth_challenge", "sso_entry",
+            "network_auth_surface"
+          ]
+        },
+        "auth_type": {"type": "string", "minLength": 1},
+        "endpoint": {"type": "string"},
+        "host": {"type": "string"},
+        "port": {"type": ["integer", "null"], "minimum": 1, "maximum": 65535},
+        "protocol": {"type": "string"},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "sources": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "login_template": {"type": "string", "description": "Matched product template ID; absent for generic forms"},
+            "login_template_label": {"type": "string"},
+            "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "login_verification": {"$ref": "#/$defs/loginVerification"},
+            "credential_fields": {
+              "type": "object",
+              "required": ["username", "password"],
+              "properties": {
+                "username": {"type": "string", "minLength": 1},
+                "password": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "id": {"type": "string", "pattern": "^auth-[0-9a-f]{16}$"},
+        "discovered_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "loginVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "transport", "request", "result"],
+      "properties": {
+        "schema": {"const": "form-check/1"},
+        "transport": {"enum": ["http", "auto"]},
+        "detection": {"type": "object", "additionalProperties": false,
+          "required": ["status_codes", "match"],
+          "properties": {
+            "status_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 200, "maximum": 299}},
+            "match": {"$ref": "#/$defs/pageDetectionRule"}
+          }
+        },
+        "request": {
+          "type": "object", "additionalProperties": false,
+          "required": ["method", "action", "encoding", "session", "defaults", "csrf_fields"],
+          "properties": {
+            "method": {"const": "POST"}, "action": {"enum": ["form", "page", "fixed"]},
+            "encoding": {"const": "form"}, "session": {"const": "fresh"},
+            "defaults": {"type": "object", "additionalProperties": {"type": "string"}},
+            "raw": {"type": "string", "minLength": 1, "maxLength": 32768},
+            "csrf_fields": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "result": {
+          "type": "object", "additionalProperties": false,
+          "required": ["success_any", "failure_any", "captcha_any", "mfa_any", "csrf_error_any"],
+          "anyOf": [
+            {"properties": {"success_any": {"minItems": 1}}},
+            {"properties": {"failure_any": {"minItems": 1}}},
+            {"required": ["success_status"]},
+            {"required": ["failure_status"]}
+          ],
+          "properties": {
+            "success_any": {"type": "array", "items": {"$ref": "#/$defs/verificationRule"}},
+            "failure_any": {"type": "array", "items": {"$ref": "#/$defs/verificationRule"}},
+            "success_status": {"type": "integer", "minimum": 200, "maximum": 599},
+            "failure_status": {"type": "integer", "minimum": 200, "maximum": 599},
+            "captcha_any": {"type": "array", "items": {"$ref": "#/$defs/verificationRule"}},
+            "mfa_any": {"type": "array", "items": {"$ref": "#/$defs/verificationRule"}},
+            "csrf_error_any": {"type": "array", "items": {"$ref": "#/$defs/verificationRule"}}
+          }
+        }
+      }
+    },
+    "pageDetectionRule": {
+      "type": "object", "minProperties": 1, "maxProperties": 1, "additionalProperties": false,
+      "properties": {
+        "all": {"type": "array", "minItems": 1, "maxItems": 30, "items": {"$ref": "#/$defs/pageDetectionRule"}},
+        "any": {"type": "array", "minItems": 1, "maxItems": 30, "items": {"$ref": "#/$defs/pageDetectionRule"}},
+        "not": {"$ref": "#/$defs/pageDetectionRule"},
+        "field_names_all": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "path_contains": {"type": "string", "minLength": 1},
+        "title_contains": {"type": "string", "minLength": 1},
+        "text_contains": {"type": "string", "minLength": 1},
+        "in_body": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "asset_path_contains": {"type": "string", "minLength": 1}
+      }
+    },
+    "verificationRule": {
+      "type": "object", "minProperties": 1, "maxProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "text_contains": {"type": "string", "minLength": 1},
+        "in_body": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "input_name": {"type": "string", "minLength": 1},
+        "form_fields": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1}},
+        "link_query": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1}}
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host", "port", "transport", "state", "service", "address",
+        "product", "version", "extra_info", "tunnel", "detection_method",
+        "service_confidence", "source"
+      ],
+      "properties": {
+        "host": {"type": "string"},
+        "port": {"type": "integer", "minimum": 1, "maximum": 65535},
+        "transport": {"type": "string"},
+        "state": {"type": "string"},
+        "service": {"type": "string"},
+        "address": {"type": "string"},
+        "product": {"type": "string"},
+        "version": {"type": "string"},
+        "extra_info": {"type": "string"},
+        "tunnel": {"type": "string"},
+        "detection_method": {"type": "string"},
+        "service_confidence": {"type": ["integer", "null"]},
+        "source": {"type": "string"}
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "message", "target", "fatal"],
+      "properties": {
+        "stage": {"type": "string"},
+        "message": {"type": "string"},
+        "target": {"type": "string"},
+        "fatal": {"type": "boolean"}
+      }
+    }
+  }
+}

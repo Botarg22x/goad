@@ -1,0 +1,64 @@
+# Вход в административную часть 1С-Битрикс.
+# Это расширенный формат: detection распознаёт страницу, verification описывает
+# известный POST-запрос и признаки ответа. Строки in_body сравниваются буквально.
+id: bitrix
+label: 1С-Битрикс — админ панель
+category: cms
+paths:
+  - /bitrix/admin/
+  - /bitrix/admin/index.php
+
+detection:
+  status_codes: [200]
+  match:
+    all:
+      - in_body: 'name="USER_LOGIN"'
+      - in_body: 'name="USER_PASSWORD"'
+      - in_body: 'Авторизация'
+      - in_body: 'Логин'
+      - in_body: 'Пароль'
+      - in_body: 'Битрикс'
+
+
+verification:
+  schema: form-check/1
+  transport: auto
+  request:
+    action: fixed
+    session: fresh
+    csrf_fields: [sessid]
+    raw: |
+      POST /bitrix/admin/?login=yes HTTP/1.1
+      Host: {{host}}
+      Cache-Control: max-age=0
+      Sec-Ch-Ua: "Not;A=Brand";v="8", "Chromium";v="150"
+      Sec-Ch-Ua-Mobile: ?0
+      Sec-Ch-Ua-Platform: "Linux"
+      Accept-Language: ru-RU,ru;q=0.9
+      Upgrade-Insecure-Requests: 1
+      Content-Type: application/x-www-form-urlencoded
+      Origin: {{origin}}
+      Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+      Sec-Fetch-Site: same-origin
+      Sec-Fetch-Mode: navigate
+      Sec-Fetch-User: ?1
+      Sec-Fetch-Dest: iframe
+      Referer: {{page_url}}
+      Priority: u=0, i
+
+      AUTH_FORM=Y&TYPE=AUTH&USER_LOGIN={{login}}&USER_PASSWORD={{password}}&Login=&captcha_sid=&captcha_word=&{{form_fields}}
+  result:
+    # 200/302/303 сами по себе не означают успех; требуется признак выхода.
+    success_any:
+      - in_body: '(window.BX || window.parent.BX).AUTHAGENT.setAuthResult(false);'
+    failure_any:
+      - in_body: "Неверный логин или пароль"
+    captcha_any:
+      - in_body: '"CAPTCHA":true'
+    mfa_any:
+      - input_name: USER_OTP
+    csrf_error_any:
+      - in_body: Ваша сессия истекла
+      - in_body: Время сессии истекло
+      - in_body: Your session has expired
+      - in_body: Session expired

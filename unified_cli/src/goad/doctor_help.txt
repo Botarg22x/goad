@@ -1,0 +1,9 @@
+GOAD DOCTOR — ПРОВЕРКА УСТАНОВКИ
+
+Использование: goad doctor [--json]
+
+# ==================== ОСНОВНОЕ ====================
+
+goad doctor       Показать доступность passgen, logingen, pointfinder, authchecker
+goad doctor --json  Вывести тот же результат в JSON
+-h, --help       Показать эту справку

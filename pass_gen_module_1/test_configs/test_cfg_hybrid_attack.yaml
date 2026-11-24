@@ -1,0 +1,22 @@
+version: 2
+
+wordlists:
+  demo:
+    path: ../dictionaries/demo.txt
+    max_lines: 3
+    min_length: 4
+    max_length: 20
+
+charsets:
+  "1": "12"
+
+patterns:
+  - "{demo}?1?1"
+  - "?1{demo}"
+
+generation:
+  confirm_above: 1_000_000
+
+output:
+  path: ../outputs/test_hybrid_attack.txt
+  overwrite: true

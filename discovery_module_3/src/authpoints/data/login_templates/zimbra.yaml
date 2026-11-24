@@ -1,0 +1,14 @@
+id: zimbra
+label: Zimbra Web Client
+category: webmail
+paths:
+  - /
+  - /zimbra/
+  - /public/login.jsp
+
+detection:
+  username_fields: [username]
+  password_fields: [password]
+  signals_any:
+    - text_contains: zimbra
+    - field_names_all: [loginOp, login_csrf]

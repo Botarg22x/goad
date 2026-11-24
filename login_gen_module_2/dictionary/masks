@@ -1,0 +1,8 @@
+# One candidate pattern per line.
+# Person variables are supported together with mask tokens:
+# ?d digits, ?l lowercase letters, ?u uppercase letters, ?1..?4 custom charsets.
+{f}.{lastname}?d
+{f}.{lastname}?d2026
+{firstname}.{lastname}?d
+{lastname}.{f}?d
+{f}{lastname}?1?1

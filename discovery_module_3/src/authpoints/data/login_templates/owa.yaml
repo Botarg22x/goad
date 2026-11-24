@@ -1,0 +1,14 @@
+id: owa
+label: Outlook Web App (локальный Exchange)
+category: webmail
+paths:
+  - /owa/
+  - /owa/auth/logon.aspx
+
+detection:
+  username_fields: [username]
+  password_fields: [password]
+  signals_any:
+    - path_contains: /owa/auth/
+    - text_contains: outlook web app
+    - text_contains: outlook web access

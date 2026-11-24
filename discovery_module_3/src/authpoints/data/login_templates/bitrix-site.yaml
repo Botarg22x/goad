@@ -1,0 +1,57 @@
+id: bitrix-site
+label: 1С-Битрикс (обычные формы сайта)
+category: cms
+paths:
+  - /bitrix/admin/
+  - /bitrix/admin/index.php
+  - /auth/
+
+detection:
+  username_fields: [USER_LOGIN]
+  password_fields: [USER_PASSWORD]
+  signals_any:
+    - path_contains: /bitrix/
+    - text_contains: bitrix
+    - text_contains: битрикс
+    - field_names_all: [AUTH_FORM, TYPE]
+
+# Модуль 4 получает копию этих правил в report.json. Адрес POST берётся
+# из найденной формы: /auth/ и /bitrix/admin/ не навязываются как action.
+# Облачный Bitrix24/SSO и полностью изменённые формы — отдельные сценарии.
+verification:
+  schema: form-check/1
+  transport: auto                 # сначала HTTP; браузер только до отправки пароля
+  request:
+    session: fresh               # новая сессия и GET формы для каждой пары
+    csrf_fields: [sessid]        # обновить, если поле есть; не хранить токен здесь
+    # action — путь + query найденной формы; host — её хост с портом.
+    # form_fields — остальные актуальные поля (включая скрытые/CSRF и кнопку).
+    # Логин и пароль автоматически URL-кодируются; cookies добавляет сессия.
+    raw: |
+      POST {{action}} HTTP/1.1
+      Host: {{host}}
+      Content-Type: application/x-www-form-urlencoded
+      Referer: {{page_url}}
+
+      AUTH_FORM=Y&TYPE=AUTH&USER_LOGIN={{login}}&USER_PASSWORD={{password}}&{{form_fields}}
+  result:
+    # Ссылка/кнопка выхода должна быть видимой, на том же origin и отсутствовать
+    # до попытки. Одних HTTP 200/302/303 или cookie недостаточно.
+    success_any:
+      - link_query: {logout: "yes"}
+      - form_fields: {logout: "yes"}  # в той же форме есть видимая кнопка submit
+    failure_any:
+      - text_contains: Неверный логин или пароль
+      - text_contains: Неверное имя пользователя или пароль
+      - text_contains: Incorrect login or password
+      - text_contains: Invalid login or password
+      - text_contains: Login or password is incorrect
+    captcha_any:
+      - input_name: captcha_word
+    mfa_any:
+      - input_name: USER_OTP
+    csrf_error_any:
+      - text_contains: Ваша сессия истекла
+      - text_contains: Время сессии истекло
+      - text_contains: Your session has expired
+      - text_contains: Session expired

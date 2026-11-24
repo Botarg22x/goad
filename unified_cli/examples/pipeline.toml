@@ -1,0 +1,46 @@
+# Copy this file to the workspace root, beside the module directories.
+schema_version = 1
+output_dir = "runs"
+
+[metadata]
+experiment = "local-lab"
+
+[stages.passwords]
+enabled = true
+args = [
+  "from-config", "config_generator.yaml",
+  "--output", "{run_dir}/passwords.txt",
+  "--yes",
+]
+cwd = "pass_gen_module_1"
+
+[stages.logins]
+enabled = true
+args = [
+  "--company", "SignCorp",
+  "--domain", "signcorp.test",
+  "--kind", "both",
+  "--output", "{run_dir}/logins.txt",
+  "--limit", "100",
+  "--no-pattern-prompt",
+  "--no-domain-prompt",
+]
+cwd = "login_gen_module_2"
+
+[stages.discover]
+enabled = true
+args = [
+  "-u", "http://127.0.0.1:8080",
+  "-t", "katana",
+  "--output", "{run_dir}/report.json",
+]
+cwd = "discovery_module_3"
+
+[stages.check]
+enabled = true
+args = [
+  "plan",
+  "--report", "{run_dir}/report.json",
+  "--logins", "{run_dir}/logins.txt",
+  "--passwords", "{run_dir}/passwords.txt",
+]

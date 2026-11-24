@@ -1,0 +1,64 @@
+POINTFINDER — ПОИСК СТРАНИЦ ВХОДА
+
+Использование: pointfinder -u URL|FILE [ПАРАМЕТРЫ]
+
+# ==================== ОСНОВНОЕ ====================
+
+pointfinder -u https://example.ru              Обойти сайт: Katana + типовые пути
+pointfinder -u urls.txt --page-only            Проверить только указанные страницы
+pointfinder -u urls.txt -t wordpress           Искать только вход WordPress
+pointfinder -u URL --page-only               Точечно проверить форму или HTTP Basic
+
+Модуль не отправляет логины и пароли. Тот же запуск: goad discover ...
+В файле urls.txt — по одному HTTP(S) URL на строку.
+
+# ==================== ПОИСК ====================
+
+-u URL|FILE                 Стартовый адрес или файл адресов; можно повторять
+-t PRODUCT[,PRODUCT]       Фильтр по шаблонам продуктов
+--list-templates            Показать доступные шаблоны
+--page-only                 Проверить стартовые страницы, не обходить ссылки и пути
+--no-katana                 Отключить обход Katana
+--no-standard-paths         Отключить типовые адреса /login, /admin и другие
+--paths-file FILE           Свой список путей для проверки
+--include-subdomains        Разрешить найденные поддомены цели
+
+Без -t находятся и нестандартные формы. Шаблоны Bitrix и GitLab дополнительно
+передают модулю 4 правила запроса и проверки ответа. Шаблоны лежат в
+src/authpoints/data/login_templates/; после правки повторите поиск.
+HTTP Basic определяется по ответу 401 и заголовку WWW-Authenticate: Basic;
+шаблон продукта и типовой путь не нужны. Katana также находит Basic на
+доступных ей страницах при обходе ссылок; --page-only ссылки не обходит.
+
+# ==================== ДОПОЛНИТЕЛЬНЫЕ ИНСТРУМЕНТЫ ====================
+
+--tools katana,nmap,subfinder   Явно выбрать инструменты; обычно только Katana
+--standard-paths               Добавить типовые пути к --tools
+--targets-file FILE            Домены и IP для выбранных инструментов
+--urls-file FILE               Файл готовых HTTP(S) URL (то же, что -u FILE)
+--doctor                       Проверить внешние инструменты
+
+Nmap и Subfinder по умолчанию не запускаются.
+
+# ==================== СКОРОСТЬ И СЕТЬ ====================
+
+--slow | --normal | --fast      Профиль скорости; normal по умолчанию
+--katana-depth N               0/1 — старт; 2 — также ссылки со старта
+--katana-max-total-pages N     Общий предел страниц
+--katana-rate-limit N          Предел новых запросов Katana в секунду
+--proxy URL                    HTTP-прокси
+--ca-cert FILE                 CA для проверки HTTPS через прокси
+--user-agent TEXT              Свой User-Agent; по умолчанию Chrome/Linux
+
+Профили Katana: slow — 1 запрос/с, normal — 10, fast — 50.
+Если обычный HTTP не распознал JS-форму, запускается скрытый браузер.
+
+# ==================== РЕЗУЛЬТАТ ====================
+
+--output FILE                  JSON-отчёт (по умолчанию report.json)
+--links-output FILE            TXT со ссылками на точки входа
+--no-json                      Сохранить только TXT
+-h, --help                    Показать эту справку
+
+Пример: pointfinder -u https://example.ru --slow --links-output auth-links.txt --no-json
+Затем: goad check -u auth-links.txt -l admin -p passwords.txt

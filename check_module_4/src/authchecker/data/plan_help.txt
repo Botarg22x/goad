@@ -1,0 +1,14 @@
+AUTHCHECKER PLAN — ПЛАН БЕЗ СЕТЕВЫХ ЗАПРОСОВ
+
+Использование: authchecker plan -r REPORT.json -l LOGIN|FILE -p PASSWORD|FILE
+
+# ==================== ОСНОВНОЕ ====================
+
+authchecker plan -r report.json -l users.txt -p passwords.txt
+
+-r, --report FILE    Готовый отчёт PointFinder
+-l VALUE|FILE       Логин или файл логинов
+-p VALUE|FILE       Пароль или файл паролей
+-h, --help         Показать эту справку
+
+Команда проверяет входные данные и считает задания, не отправляя запросы.

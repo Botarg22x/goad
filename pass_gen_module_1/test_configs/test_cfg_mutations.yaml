@@ -1,0 +1,25 @@
+version: 2
+
+wordlists:
+  russian:
+    path: ../dictionaries/ru.txt
+    max_lines: 20
+    min_length: 4
+    max_length: 20
+
+mutations:
+  mode: independent
+  include_original: false
+  default_apply: true
+  rules:
+    - type: ru_to_eng
+
+patterns:
+  - "{russian}"
+
+generation:
+  confirm_above: 1_000_000
+
+output:
+  path: ../outputs/test_mutations.txt
+  overwrite: true

@@ -1,0 +1,36 @@
+# Common authentication entry points. One root-relative path per line.
+/login
+/signin
+/sign-in
+/auth
+/auth/login
+/auth/signin
+/authenticate
+/account/login
+/accounts/login
+/admin
+/admin/login
+/administrator
+/user/login
+/users/sign_in
+/session/new
+/sessions/new
+/sso
+/sso/login
+/cas/login
+/oauth/authorize
+/oauth2/authorize
+/oidc
+/oidc/login
+/saml/login
+/adfs/ls
+/wp-login.php
+/web/login
+/remote/login
+/owa/auth/logon.aspx
+/api/auth/login
+
+# Common discovery and identity metadata files.
+/robots.txt
+/sitemap.xml
+/.well-known/openid-configuration
